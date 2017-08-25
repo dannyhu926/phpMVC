@@ -108,9 +108,12 @@ class BaseModel extends Model
      * @param    mixed $condtion where语句数组形式
      * @return   boolean          操作是否成功
      */
-    public function getPagerList($page, $condtion = [], $pageSize) {
+    public function getPagerList($page, $condtion = [], $pageSize, $orderBy = '') {
         $offset = ($page - 1) * $pageSize;
-        return $this->where($condtion)->limit("$offset, $pageSize")->select();
+        if (empty($order)) {
+            $orderBy = "{$this->pk} DESC";
+        }
+        return $this->where($condtion)->order($orderBy)->limit("$offset, $pageSize")->select();
     }
 
     public function filterDbFields($data) {
