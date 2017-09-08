@@ -144,4 +144,9 @@ class BaseModel extends Model
     public function softDelete($id) {
         return $this->editData([$this->pk => $id], [$this->soft_delete_field => 1]);
     }
+
+    public function deleteByPk($id) {
+        $result = $this->where([$this->pk => $id])->delete();
+        return $result;
+    }
 }
