@@ -89,8 +89,8 @@ class BaseModel extends Model
      */
     public function editData($map, $data) {
         $data = $this->filterDbFields($data);
-        $result = $this->where($map)->save($data);
-        return $result;
+        $this->where($map)->save($data);
+        return empty($this->getError());
     }
 
     /**
