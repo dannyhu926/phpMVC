@@ -89,6 +89,9 @@ class BaseModel extends Model
      */
     public function editData($map, $data) {
         $data = $this->filterDbFields($data);
+        if (is_int($map)) {
+            $map[$this->pk] = $map;
+        }
         $this->where($map)->save($data);
         return empty($this->getError());
     }
@@ -99,6 +102,9 @@ class BaseModel extends Model
      * @return   boolean          操作是否成功
      */
     public function deleteData($map) {
+        if (is_int($map)) {
+            $map[$this->pk] = $map;
+        }
         $result = $this->where($map)->delete();
         return $result;
     }
@@ -110,7 +116,7 @@ class BaseModel extends Model
      */
     public function getPagerList($page, $condtion = [], $pageSize, $orderBy = '') {
         $offset = ($page - 1) * $pageSize;
-        if (empty($order)) {
+        if (empty($orderBy)) {
             $orderBy = "{$this->pk} DESC";
         }
         return $this->where($condtion)->order($orderBy)->limit("$offset, $pageSize")->select();
@@ -137,8 +143,11 @@ class BaseModel extends Model
         return $this->field($field)->where([$this->pk => $id])->find();
     }
 
-    public function fetchAll($condtion) {
-        return $this->where($condtion)->select();
+    public function fetchAll($condtion=[], $orderBy='') {
+        if (empty($orderBy)) {
+            $orderBy = "{$this->pk} DESC";
+        }
+        return $this->where($condtion)->order($orderBy)->select();
     }
 
     public function softDelete($id) {
