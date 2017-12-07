@@ -158,4 +158,26 @@ class BaseModel extends Model
         $result = $this->where([$this->pk => $id])->delete();
         return $result;
     }
+    
+    /**
+     * 取得数据表的字段信息
+     * @access public
+     * @return array
+     */
+    public function getFields() {
+        $result = $this->query('SHOW FULL COLUMNS FROM ' . $this->getTableName());
+        $columns = array();
+        foreach ($result as $val) {
+            $columns[$val['field']] = array(
+                'name' => $val['field'],
+                'type' => $val['type'],
+                'notnull' => (bool)($val['null'] === ''), // not null is empty, null is yes
+                'default' => $val['default'],
+                'comment' => $val['comment'],
+                'primary' => (strtolower($val['key']) == 'pri'),
+                'autoinc' => (strtolower($val['extra']) == 'auto_increment'),
+            );
+        }
+        return $columns;
+    }
 }
