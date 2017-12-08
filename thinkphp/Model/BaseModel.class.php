@@ -89,7 +89,7 @@ class BaseModel extends Model
      */
     public function editData($map, $data) {
         $data = $this->filterDbFields($data);
-        if (is_int($map)) {
+        if (!is_array($map)) {
             $map[$this->pk] = $map;
         }
         $this->where($map)->save($data);
@@ -102,7 +102,7 @@ class BaseModel extends Model
      * @return   boolean          操作是否成功
      */
     public function deleteData($map) {
-        if (is_int($map)) {
+        if (!is_array($map)) {
             $map[$this->pk] = $map;
         }
         $result = $this->where($map)->delete();
@@ -143,7 +143,7 @@ class BaseModel extends Model
         return $this->field($field)->where([$this->pk => $id])->find();
     }
 
-    public function fetchAll($condtion=[], $orderBy='') {
+    public function fetchAll($condtion = [], $orderBy = '') {
         if (empty($orderBy)) {
             $orderBy = "{$this->pk} DESC";
         }
@@ -158,7 +158,7 @@ class BaseModel extends Model
         $result = $this->where([$this->pk => $id])->delete();
         return $result;
     }
-    
+
     /**
      * 取得数据表的字段信息
      * @access public
