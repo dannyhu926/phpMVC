@@ -88,11 +88,12 @@ class BaseModel extends Model
      * @return    boolean         操作是否成功
      */
     public function editData($map, $data) {
-        $data = $this->filterDbFields($data);
+        $condition = [];
         if (!is_array($map)) {
-            $map[$this->pk] = $map;
+            $condition[$this->pk] = $map;
         }
-        $this->where($map)->save($data);
+        $data = $this->filterDbFields($data);
+        $this->where($condition)->save($data);
         return empty($this->getError());
     }
 
@@ -102,10 +103,11 @@ class BaseModel extends Model
      * @return   boolean          操作是否成功
      */
     public function deleteData($map) {
+        $condition = [];
         if (!is_array($map)) {
-            $map[$this->pk] = $map;
+            $condition[$this->pk] = $map;
         }
-        $result = $this->where($map)->delete();
+        $result = $this->where($condition)->delete();
         return $result;
     }
 
