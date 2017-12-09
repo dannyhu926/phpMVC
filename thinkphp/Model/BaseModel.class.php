@@ -88,7 +88,7 @@ class BaseModel extends Model
      * @return    boolean         操作是否成功
      */
     public function editData($map, $data) {
-        $condition = [];
+        $condition = $map;
         if (!is_array($map)) {
             $condition[$this->pk] = $map;
         }
@@ -103,7 +103,7 @@ class BaseModel extends Model
      * @return   boolean          操作是否成功
      */
     public function deleteData($map) {
-        $condition = [];
+        $condition = $map;
         if (!is_array($map)) {
             $condition[$this->pk] = $map;
         }
