@@ -88,9 +88,10 @@ class BaseModel extends Model
      * @return    boolean         操作是否成功
      */
     public function editData($map, $data) {
-        $condition = $map;
         if (!is_array($map)) {
             $condition[$this->pk] = $map;
+        } else {
+            $condition = $map;
         }
         $data = $this->filterDbFields($data);
         $this->where($condition)->save($data);
@@ -103,9 +104,10 @@ class BaseModel extends Model
      * @return   boolean          操作是否成功
      */
     public function deleteData($map) {
-        $condition = $map;
         if (!is_array($map)) {
             $condition[$this->pk] = $map;
+        } else {
+            $condition = $map;
         }
         $result = $this->where($condition)->delete();
         return $result;
