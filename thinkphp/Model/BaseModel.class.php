@@ -123,7 +123,10 @@ class BaseModel extends Model
         if (empty($orderBy)) {
             $orderBy = "{$this->pk} DESC";
         }
-        return $this->where($condtion)->order($orderBy)->limit("$offset, $pageSize")->select();
+        $count = $this->where($condtion)->count();
+        $result['list'] = $this->where($condtion)->order($orderBy)->limit("$offset, $pageSize")->select();
+        $result['pager'] = ['total' => $count, 'page' => $page, "page_size" => $pageSize];
+        return $result;
     }
 
     public function filterDbFields($data) {
