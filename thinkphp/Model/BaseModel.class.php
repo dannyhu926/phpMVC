@@ -12,6 +12,8 @@ class BaseModel extends Model
     protected $add_time_field = 'created_time';
     protected $soft_delete_field = 'deleted';
     protected $transactions = 0; //事物嵌套支持
+    protected $excepts = []; //存储排除不查的字段
+    protected $orginal = []; //存放模型原始数据
 
     public function startTrans() {
         ++$this->transactions;
@@ -186,5 +188,75 @@ class BaseModel extends Model
             );
         }
         return $columns;
+    }
+
+    /**
+     * 在查询的时候排除某个字段不查
+     * @return $this
+     */
+    public function except() {
+        foreach (func_get_args() as $field) {
+            if (is_string($field) && !in_array($field, $this->excepts)) {
+                if (strpos($field, ',') !== false) {
+                    $field = explode(',', $field);
+                } else {
+                    $field = array($field);
+                }
+            }
+            if (is_array($field)) {
+                $this->excepts = array_merge($field, $this->excepts);
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * 添加过滤规则，让其支持except
+     * @param $options
+     */
+    protected function _options_filter(&$options) {
+        if (count($this->excepts) > 0) {
+            if (!isset($options['field'])) {
+                $options['field'] = $this->getDbFields();
+            }
+            foreach ($options['field'] as $i => $field) {
+                if (in_array($field, $this->excepts)) {
+                    unset($options['field'][$i]);
+                }
+            }
+        }
+    }
+
+    /**
+     * 获取修改的字段
+     * @return array
+     */
+    public function getDirty() {
+        $result = [];
+        foreach ($this->getDbFields() as $field) {
+            if ($this->isDirty($field)) {
+                $result[$field] = $this->data[$field];
+            }
+        }
+        return $result;
+    }
+
+    public function save($data = '', $options = array()) {
+        if (empty($data)) {
+            $data = $this->getDirty();
+        }
+        return parent::save($data, $options);
+    }
+
+    /**
+     * 检测字段是否修改
+     * @param $attr
+     * @return bool
+     */
+    public function isDirty($attr) {
+        if (!isset($this->data[$attr])) {
+            return false;
+        }
+        return $this->data[$attr] !== $this->orginal[$attr];
     }
 }
